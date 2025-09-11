@@ -21,5 +21,9 @@ depends_on = []
 clarity_version = 2
 repl_file = "lib/repl-utils.clar"
 
+[repl.analysis]
+passes = ["check_checker"]
+check_checker = { trusted_sender = false, trusted_caller = false, callee_filter = false }
+
 [testing]
 testing_lib = "lib/test-utils.clar"
