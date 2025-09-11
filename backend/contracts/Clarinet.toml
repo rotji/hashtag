@@ -1,5 +1,5 @@
 [project]
-name = "backend"
+name = "contracts"
 authors = []
 description = "Smart contracts for the campaign platform"
 telemetry = true
@@ -11,6 +11,10 @@ depends_on = []
 
 [contracts.user-roles]
 path = "contracts/user-roles.clar"
+depends_on = []
+
+[contracts.oracle-registry]
+path = "contracts/oracle-registry.clar"
 depends_on = []
 
 [repl]
