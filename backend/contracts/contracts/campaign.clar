@@ -4,11 +4,24 @@
 ;; for social media mentions, designed to be updated by a trusted off-chain oracle.
 
 ;; ---
+;; Traits for Contract Dependencies
+;; ---
+(define-trait user-roles-trait
+  (
+    (get-role (principal) (response (string-ascii 12) uint))
+  )
+)
+
+(define-trait oracle-registry-trait
+  (
+    (is-oracle (principal) (response bool uint))
+  )
+)
+
+;; ---
 ;; Constants & Errors
 ;; ---
 (define-constant CONTRACT_OWNER tx-sender)
-;; This should be updated to use the oracle-registry contract in a future step.
-(define-constant ORACLE_PRINCIPAL tx-sender)
 
 ;; Error Codes
 (define-constant ERR_UNAUTHORIZED (err u101))
@@ -45,7 +58,8 @@
 ;; ---
 (define-public (award-mention (campaign-id uint) (user principal))
   (begin
-    (asserts! (is-eq tx-sender ORACLE_PRINCIPAL) ERR_UNAUTHORIZED)
+    ;; PERMISSION CHECK: Ensure the caller is a registered oracle
+    (asserts! (unwrap! (contract-call? .oracle-registry is-oracle tx-sender) ERR_UNAUTHORIZED) ERR_UNAUTHORIZED)
 
     (let
       ((campaign (unwrap! (map-get? campaigns campaign-id) ERR_CAMPAIGN_NOT_FOUND))
@@ -71,18 +85,25 @@
 ;; Brand Functions
 ;; ---
 (define-public (create-campaign (name (string-ascii 64)) (initial-budget uint) (reward-per-mention uint))
-  (let ((new-id (+ (var-get campaign-id-counter) u1)))
-    (try! (ft-transfer? reward-points initial-budget tx-sender (as-contract tx-sender)))
+  (begin
+    ;; PERMISSION CHECK: Ensure the caller has the "brand" role
+    (let ((role (unwrap! (contract-call? .user-roles get-role tx-sender) ERR_UNAUTHORIZED)))
+      (asserts! (is-eq role "brand") ERR_UNAUTHORIZED)
+    )
 
-    (map-set campaigns new-id {
-      brand-owner: tx-sender,
-      name: name,
-      total-budget: initial-budget,
-      reward-per-mention: reward-per-mention,
-      is-active: true
-    })
-    (var-set campaign-id-counter new-id)
-    (ok new-id)
+    (let ((new-id (+ (var-get campaign-id-counter) u1)))
+      (try! (ft-transfer? reward-points initial-budget tx-sender (as-contract tx-sender)))
+
+      (map-set campaigns new-id {
+        brand-owner: tx-sender,
+        name: name,
+        total-budget: initial-budget,
+        reward-per-mention: reward-per-mention,
+        is-active: true
+      })
+      (var-set campaign-id-counter new-id)
+      (ok new-id)
+    )
   )
 )
 
