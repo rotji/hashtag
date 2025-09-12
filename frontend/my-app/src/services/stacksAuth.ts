@@ -25,3 +25,4 @@ export function disconnectWallet() {
 export function getUserSession() {
   return userSession;
 }
+
