@@ -1,0 +1,25 @@
+[project]
+name = "contracts"
+authors = []
+description = "Smart contracts for the campaign platform"
+telemetry = true
+requirements = []
+
+[contracts.campaign]
+path = "contracts/campaign.clar"
+depends_on = []
+
+[contracts.user-roles]
+path = "contracts/user-roles.clar"
+depends_on = []
+
+[contracts.oracle-registry]
+path = "contracts/oracle-registry.clar"
+depends_on = []
+
+[repl]
+clarity_version = 2
+repl_file = "lib/repl-utils.clar"
+
+[testing]
+testing_lib = "lib/test-utils.clar"
