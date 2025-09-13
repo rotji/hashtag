@@ -1,20 +1,22 @@
 import { Clarinet, Tx, Chain, Account, types } from 'https://deno.land/x/clarinet@v1.8.0/index.ts';
 import { assertEquals } from 'https://deno.land/std@0.170.0/testing/asserts.ts';
 
+// Test case for ensuring a user with the 'brand' role can create a campaign.
 Clarinet.test({
     name: "Campaigns: Ensures a user with the 'brand' role can create a campaign",
     async fn(chain: Chain, accounts: Map<string, Account>) {
+        // Get the deployer and brand wallet accounts.
         const deployer = accounts.get('deployer')!;
         const brandWallet = accounts.get('wallet_1')!;
 
-        // Pre-condition: Make wallet_1 a "brand"
-        // The deployer (admin) of user-roles sets the role for brandWallet
+        // Pre-condition: Make wallet_1 a "brand".
+        // The deployer (admin) of user-roles sets the role for brandWallet.
         chain.mineBlock([
             Tx.contractCall('user-roles', 'set-role', [types.principal(brandWallet.address), types.ascii("brand")], deployer.address),
         ]);
 
-        // Mint some reward tokens to the brand wallet to use as a budget
-        // The deployer of the campaign contract is the token owner initially
+        // Mint some reward tokens to the brand wallet to use as a budget.
+        // The deployer of the campaign contract is the token owner initially.
         chain.mineBlock([
             Tx.contractCall('campaign', 'create-campaign', [
                 types.ascii("Test Campaign"),
@@ -35,10 +37,11 @@ Clarinet.test({
     },
 });
 
-
+// Test case for ensuring a user without the 'brand' role cannot create a campaign.
 Clarinet.test({
     name: "Campaigns: Ensures a user without the 'brand' role cannot create a campaign",
     async fn(chain: Chain, accounts: Map<string, Account>) {
+        // Get the non-brand wallet account.
         const nonBrandWallet = accounts.get('wallet_2')!;
 
         // Attempt to create a campaign from a wallet that does not have the "brand" role.

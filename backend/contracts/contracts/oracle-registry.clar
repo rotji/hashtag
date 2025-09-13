@@ -8,7 +8,7 @@
 ;; Constants and Errors
 ;; ---
 (define-constant CONTRACT_OWNER tx-sender)
-(define-constant ERR_UNAUTHORIZED (err u301))
+(define-constant ERR_UNAUTHORIZED (err u301)) ;; Error for unauthorized access.
 
 ;; ---
 ;; Data Storage
@@ -29,7 +29,9 @@
 ;; @returns (ok bool) or an error.
 (define-public (add-oracle (new-oracle principal))
   (begin
+    ;; Ensure the caller is the contract owner.
     (asserts! (is-eq tx-sender CONTRACT_OWNER) ERR_UNAUTHORIZED)
+    ;; Add the new oracle to the map.
     (map-set oracles new-oracle true)
     (ok true)
   )
@@ -41,7 +43,9 @@
 ;; @returns (ok bool) or an error.
 (define-public (remove-oracle (oracle-to-remove principal))
   (begin
+    ;; Ensure the caller is the contract owner.
     (asserts! (is-eq tx-sender CONTRACT_OWNER) ERR_UNAUTHORIZED)
+    ;; Remove the oracle from the map.
     (map-delete oracles oracle-to-remove)
     (ok true)
   )
@@ -56,5 +60,6 @@
 ;; @param who: The principal to check.
 ;; @returns (ok true) if the principal is a trusted oracle, (ok false) otherwise.
 (define-read-only (is-oracle (who principal))
+  ;; Returns true if the principal is in the oracles map, false otherwise.
   (ok (is-some (map-get? oracles who)))
 )
