@@ -8,8 +8,8 @@
 ;; Constants and Errors
 ;; ---
 (define-constant CONTRACT_OWNER tx-sender)
-(define-constant ERR_UNAUTHORIZED (err u201))
-(define-constant ERR_INVALID_ROLE (err u202))
+(define-constant ERR_UNAUTHORIZED (err u201)) ;; Error for unauthorized access.
+(define-constant ERR_INVALID_ROLE (err u202)) ;; Error for assigning an invalid role.
 
 ;; ---
 ;; Data Storage
@@ -52,5 +52,6 @@
 ;; @param user: The principal of the user to check.
 ;; @returns (response (string-ascii 12) "none") - The user's role, or "participant" if none is set.
 (define-read-only (get-role (user principal))
+  ;; If a user does not have a role, they are considered a "participant".
   (ok (default-to "participant" (map-get? roles user)))
 )
