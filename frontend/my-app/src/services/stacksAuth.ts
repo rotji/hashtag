@@ -5,7 +5,9 @@ const appConfig = new AppConfig(['publish_data']);
 // Create a new UserSession object. This is used to manage the user's session.
 const userSession = new UserSession({ appConfig });
 
-// This function shows the Stacks connect pop-up.
+/**
+ * Shows the Stacks connect pop-up to initiate wallet connection.
+ */
 export function connectWallet() {
   showConnect({
     appDetails: {
@@ -21,12 +23,17 @@ export function connectWallet() {
   });
 }
 
-// This function signs the user out.
+/**
+ * Signs the user out and redirects to the homepage.
+ */
 export function disconnectWallet() {
   userSession.signUserOut('/');
 }
 
-// This function returns the UserSession object.
+/**
+ * Retrieves the current user session object.
+ * @returns {UserSession} The UserSession object for managing the user's session.
+ */
 export function getUserSession() {
   return userSession;
 }

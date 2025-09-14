@@ -65,7 +65,14 @@
 ;; ---
 ;; Oracle Function
 ;; ---
-;; Called by a trusted oracle to award a user for a social media mention.
+;;; Awards a user for a social media mention.
+;;; This function can only be called by a trusted oracle. It credits a user with rewards
+;;; for a specific campaign, drawing from the campaign's budget.
+;;;
+;;; @param campaign-id {uint} The ID of the campaign to which the mention belongs.
+;;; @param user {principal} The principal of the user who made the social media mention.
+;;; @returns (response bool uint) Returns (ok true) on success, or an error if the oracle is
+;;; unauthorized, the campaign is not found, inactive, or has an insufficient budget.
 (define-public (award-mention (campaign-id uint) (user principal))
   (begin
     ;; PERMISSION CHECK: Ensure the caller is a registered oracle
@@ -97,7 +104,15 @@
 ;; ---
 ;; Brand Functions
 ;; ---
-;; Creates a new campaign. Can only be called by a user with the "brand" role.
+;;; Creates a new campaign.
+;;; This function can only be called by a user with the "brand" role. It initializes a new
+;;; campaign with a specified budget and reward structure.
+;;;
+;;; @param name {string-ascii 64} The name of the campaign.
+;;; @param initial-budget {uint} The total budget for the campaign, provided in reward-points.
+;;; @param reward-per-mention {uint} The amount of reward-points to be awarded for each mention.
+;;; @returns (response uint uint) Returns (ok new-id) with the ID of the newly created campaign on success,
+;;; or an error if the user is not authorized.
 (define-public (create-campaign (name (string-ascii 64)) (initial-budget uint) (reward-per-mention uint))
   (begin
     ;; PERMISSION CHECK: Ensure the caller has the "brand" role
@@ -123,7 +138,13 @@
   )
 )
 
-;; Deactivates a campaign and refunds the remaining budget to the brand owner.
+;;; Deactivates a campaign and refunds the remaining budget.
+;;; This function can only be called by the brand owner of the campaign. It deactivates the campaign
+;;; and refunds any remaining budget to the brand owner.
+;;;
+;;; @param campaign-id {uint} The ID of the campaign to deactivate.
+;;; @returns (response bool uint) Returns (ok true) on success, or an error if the campaign is not found
+;;; or the user is not the brand owner.
 (define-public (deactivate-campaign (campaign-id uint))
   (let ((campaign (unwrap! (map-get? campaigns campaign-id) ERR_CAMPAIGN_NOT_FOUND)))
     ;; PERMISSION CHECK: Ensure the caller is the brand owner.
@@ -147,7 +168,11 @@
 ;; ---
 ;; User Functions
 ;; ---
-;; Allows a user to claim their pending rewards for a campaign.
+;;; Claims pending rewards for a campaign.
+;;; Allows a user to claim their accumulated rewards for a specific campaign.
+;;;
+;;; @param campaign-id {uint} The ID of the campaign for which to claim rewards.
+;;; @returns (response bool uint) Returns (ok true) on success, or an error if the user has no rewards to claim.
 (define-public (claim-rewards (campaign-id uint))
   (let
     ((rewards-to-claim (get-user-rewards-for-campaign campaign-id tx-sender)))
@@ -168,17 +193,27 @@
 ;; ---
 ;; Read-Only Functions
 ;; ---
-;; Retrieves the details of a campaign.
+;;; Retrieves the details of a campaign.
+;;;
+;;; @param campaign-id {uint} The ID of the campaign to retrieve.
+;;; @returns (response (optional { brand-owner: principal, name: (string-ascii 64), total-budget: uint, reward-per-mention: uint, is-active: bool }) uint)
+;;; Returns the campaign details if found, otherwise none.
 (define-read-only (get-campaign-details (campaign-id uint))
   (map-get? campaigns campaign-id)
 )
 
-;; Retrieves the pending rewards for a user in a campaign.
+;;; Retrieves the pending rewards for a user in a campaign.
+;;;
+;;; @param campaign-id {uint} The ID of the campaign.
+;;; @param user {principal} The principal of the user.
+;;; @returns {uint} The amount of pending rewards for the user in the specified campaign. Defaults to u0 if none.
 (define-read-only (get-user-rewards-for-campaign (campaign-id uint) (user principal))
   (default-to u0 (map-get? user-pending-rewards { campaign-id: campaign-id, user: user }))
 )
 
-;; Retrieves the total number of campaigns created.
+;;; Retrieves the total number of campaigns created.
+;;;
+;;; @returns (response uint uint) Returns (ok campaign-id-counter) with the total number of campaigns.
 (define-read-only (get-campaign-count)
   (ok (var-get campaign-id-counter))
 )

@@ -23,10 +23,11 @@
 ;; Admin Functions
 ;; ---
 
-;; @desc Adds a new principal to the list of trusted oracles.
-;; @desc Can only be called by the CONTRACT_OWNER.
-;; @param new-oracle: The principal of the oracle to add.
-;; @returns (ok bool) or an error.
+;;; Adds a new principal to the list of trusted oracles.
+;;; Can only be called by the CONTRACT_OWNER.
+;;;
+;;; @param new-oracle {principal} The principal of the oracle to add.
+;;; @returns (response bool uint) Returns (ok true) on success, or an error if the caller is not authorized.
 (define-public (add-oracle (new-oracle principal))
   (begin
     ;; Ensure the caller is the contract owner.
@@ -37,10 +38,11 @@
   )
 )
 
-;; @desc Removes a principal from the list of trusted oracles.
-;; @desc Can only be called by the CONTRACT_OWNER.
-;; @param oracle-to-remove: The principal of the oracle to remove.
-;; @returns (ok bool) or an error.
+;;; Removes a principal from the list of trusted oracles.
+;;; Can only be called by the CONTRACT_OWNER.
+;;;
+;;; @param oracle-to-remove {principal} The principal of the oracle to remove.
+;;; @returns (response bool uint) Returns (ok true) on success, or an error if the caller is not authorized.
 (define-public (remove-oracle (oracle-to-remove principal))
   (begin
     ;; Ensure the caller is the contract owner.
@@ -56,9 +58,10 @@
 ;; Read-Only Functions
 ;; ---
 
-;; @desc Checks if a given principal is a registered oracle.
-;; @param who: The principal to check.
-;; @returns (ok true) if the principal is a trusted oracle, (ok false) otherwise.
+;;; Checks if a given principal is a registered oracle.
+;;;
+;;; @param who {principal} The principal to check.
+;;; @returns (response bool uint) Returns (ok true) if the principal is a trusted oracle, (ok false) otherwise.
 (define-read-only (is-oracle (who principal))
   ;; Returns true if the principal is in the oracles map, false otherwise.
   (ok (is-some (map-get? oracles who)))

@@ -4,6 +4,11 @@ import viteLogo from '/vite.svg'
 import './App.css'
 import WalletConnectButton from './components/WalletConnectButton';
 
+/**
+ * The main application component.
+ * Renders the wallet connection button, logos, and a counter.
+ * @returns {JSX.Element} The rendered App component.
+ */
 function App() {
   const [count, setCount] = useState(0)
 
