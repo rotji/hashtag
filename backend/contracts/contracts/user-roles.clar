@@ -24,11 +24,12 @@
 ;; Public Functions
 ;; ---
 
-;; @desc Assigns a role to a user.
-;; @desc Can only be called by the CONTRACT_OWNER (the initial admin).
-;; @param user: The principal of the user to assign a role to.
-;; @param role: The role to assign. Must be "admin", "brand", or "participant".
-;; @returns (ok bool) or an error.
+;;; Assigns a role to a user.
+;;; Can only be called by the CONTRACT_OWNER.
+;;;
+;;; @param user {principal} The principal of the user to assign a role to.
+;;; @param new-role {(string-ascii 12)} The role to assign. Must be "admin", "brand", or "participant".
+;;; @returns (response bool uint) Returns (ok true) on success, or an error if the caller is not authorized or the role is invalid.
 (define-public (set-role (user principal) (new-role (string-ascii 12)))
   (begin
     ;; Ensure only the contract owner can set roles
@@ -48,9 +49,10 @@
 ;; Read-Only Functions
 ;; ---
 
-;; @desc Retrieves the role for a given user.
-;; @param user: The principal of the user to check.
-;; @returns (response (string-ascii 12) "none") - The user's role, or "participant" if none is set.
+;;; Retrieves the role for a given user.
+;;;
+;;; @param user {principal} The principal of the user to check.
+;;; @returns (response (string-ascii 12) uint) The user's role, or "participant" if none is set.
 (define-read-only (get-role (user principal))
   ;; If a user does not have a role, they are considered a "participant".
   (ok (default-to "participant" (map-get? roles user)))

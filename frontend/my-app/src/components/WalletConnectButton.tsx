@@ -2,32 +2,40 @@ import React, { useState, useEffect } from 'react';
 import { connectWallet, disconnectWallet, getUserSession } from '../services/stacksAuth';
 import { UserData } from '@stacks/connect';
 
-// This component provides a button to connect and disconnect a Stacks wallet.
+/**
+ * A React component that provides a button to connect and disconnect a Stacks wallet.
+ * It displays the user's address when connected and a "Connect Wallet" button when disconnected.
+ * @returns {JSX.Element} The rendered WalletConnectButton component.
+ */
 const WalletConnectButton: React.FC = () => {
-  // State to hold user data.
+  /**
+   * State to hold the user's data, or null if not logged in.
+   * @type {[UserData | null, React.Dispatch<React.SetStateAction<UserData | null>>]}
+   */
   const [userData, setUserData] = useState<UserData | null>(null);
-  // Get the user session object.
   const userSession = getUserSession();
 
-  // On component mount, check if the user is signed in and load their data.
   useEffect(() => {
     if (userSession.isUserSignedIn()) {
       setUserData(userSession.loadUserData());
     }
   }, []);
 
-  // Function to handle wallet connection.
+  /**
+   * Handles the wallet connection process.
+   */
   const handleConnect = () => {
     connectWallet();
   };
 
-  // Function to handle wallet disconnection.
+  /**
+   * Handles the wallet disconnection process.
+   */
   const handleDisconnect = () => {
     disconnectWallet();
     setUserData(null);
   };
 
-  // If the user is logged in, display their address and a disconnect button.
   if (userData) {
     // User is logged in
     const userAddress = userData.profile?.stxAddress?.testnet ?? userData.profile?.stxAddress?.mainnet;
